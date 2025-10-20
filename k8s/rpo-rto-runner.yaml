@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rpo-rto-runner
+  namespace: dr-tests
+spec:
+  template:
+    spec:
+      serviceAccountName: default
+      restartPolicy: Never
+      containers:
+      - name: runner
+        image: public.ecr.aws/docker/library/alpine:3.20
+        command: ["/bin/sh","-c"]
+        args:
+        - apk add --no-cache curl bash jq;
+          wget -O /tmp/probe.sh https://raw.githubusercontent.com/2025-demo-01/tests-and-dr/main/scripts/rpo_rto_probe.sh;
+          chmod +x /tmp/probe.sh; /tmp/probe.sh;
+        envFrom:
+        - configMapRef: { name: rpo-rto-scripts }
