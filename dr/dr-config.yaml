@@ -1,0 +1,15 @@
+primary:
+  kubecontext: "prod-apne2"
+  health_url: "https://api.upx.exchange/healthz"
+  read_only_switch: "on"
+secondary:
+  kubecontext: "dr-apne1"
+  health_url: "https://api-dr.upx.exchange/healthz"
+  ready_gate: "on"
+pushgateway:
+  url: "http://pushgateway.observability.svc.cluster.local:9091"
+  basic_auth:
+    username: "sophielog"
+    password: "sophielog"
+timeout_seconds: 900
+probe_interval_seconds: 5
