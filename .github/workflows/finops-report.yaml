@@ -1,1 +1,18 @@
-
+name: FinOps Report
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+jobs:
+  capture-opencost:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch OpenCost snapshot
+        env:
+          OC_URL: ${{ secrets.OPEN_COST_URL }}
+        run: |
+          curl -s "${OC_URL:-http://opencost.opencost.svc.cluster.local:9090}/allocation/compute?window=24h" | tee opencost.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finops-opencost
+          path: opencost.json
