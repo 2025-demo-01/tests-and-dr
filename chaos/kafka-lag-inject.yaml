@@ -1,1 +1,17 @@
-
+apiVersion: chaos-mesh.org/v1alpha1
+kind: HTTPChaos
+metadata:
+  name: kafka-consumer-delay
+  namespace: data-platform
+spec:
+  mode: all
+  selector:
+    labelSelectors:
+      "app": "flink"  # 또는 consumer app 라벨
+  target: Request
+  port: 8081
+  path: /.*
+  method: GET
+  delay:
+    latency: "800ms"
+  duration: "10m"
