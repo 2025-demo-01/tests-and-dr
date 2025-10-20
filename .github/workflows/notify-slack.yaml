@@ -1,1 +1,14 @@
-
+name: Notify Slack
+on:
+  workflow_run:
+    workflows: ["DR Weekly","SLO CI","Chaos Suite","FinOps Report"]
+    types: [completed]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post
+        run: |
+          MSG="workflow $GITHUB_WORKFLOW finished with conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "$MSG"
+          # curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$MSG\"}" "${SLACK_WEBHOOK:-sophielog}"
