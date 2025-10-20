@@ -1,1 +1,15 @@
-
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: me-cpu-throttle
+  namespace: matching
+spec:
+  mode: one
+  selector:
+    labelSelectors:
+      "app": "matching-engine"
+  stressors:
+    cpu:
+      workers: 2
+      load: 70
+  duration: "5m"
