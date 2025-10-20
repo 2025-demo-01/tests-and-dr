@@ -1,1 +1,8 @@
-
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: region-failover-gate
+  namespace: dr-tests
+data:
+  activeRegion: "secondary"
+  note: "manual switch simulated"
