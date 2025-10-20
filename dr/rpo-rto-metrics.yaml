@@ -1,1 +1,21 @@
-
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: rpo-rto-rules
+  namespace: observability
+spec:
+  groups:
+    - name: dr
+      rules:
+        - alert: RTOExceeded
+          expr: max(rpo_rto_seconds) > 600
+          for: 5m
+          labels:
+            severity: critical
+            owner: sre
+          annotations:
+            summary: "failover duration exceeded"
+        - record: dr:rto_seconds
+          expr: max(rpo_rto_seconds)
+        - record: dr:rpo_seconds
+          expr: max(rpo_seconds)
