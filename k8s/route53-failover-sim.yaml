@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: route53-failover-sim
+  namespace: dr-tests
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: failover
+        image: public.ecr.aws/docker/library/alpine:3.20
+        command: ["/bin/sh","-c"]
+        args:
+        - echo "simulate primary ALB health fail for 60s";
+          sleep 60
