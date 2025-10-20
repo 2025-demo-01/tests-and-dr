@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rpo-rto-scripts
+  namespace: dr-tests
+data:
+  RPO_TARGET_SECONDS: "15"
+  RTO_TARGET_SECONDS: "300"
+  PROM_PUSHGATEWAY: "http://prometheus-pushgateway.observability:9091"
+  TRADE_TOPIC: "trade-events"
+  CHECK_URL: "https://api.upx.exchange/healthz"
