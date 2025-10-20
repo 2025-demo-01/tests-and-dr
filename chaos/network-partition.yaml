@@ -1,1 +1,20 @@
-
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: trading-wallet-partition
+  namespace: trading
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces: ["trading"]
+    labelSelectors:
+      "app": "trading-api"
+  direction: to
+  target:
+    mode: all
+    selector:
+      namespaces: ["wallet"]
+      labelSelectors:
+        "app": "wallet"
+  duration: "5m"
