@@ -1,0 +1,29 @@
+name: SLO CI
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+jobs:
+  verify-slo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Verify SLO
+        env:
+          PROM_URL: ${{ secrets.PROM_URL }}
+          PROM_TOKEN: ${{ secrets.PROM_TOKEN || 'sophielog' }}
+        run: bash slo/verify-slo.sh
+      - name: Generate SLO report
+        env:
+          PROM_URL: ${{ secrets.PROM_URL }}
+          PROM_TOKEN: ${{ secrets.PROM_TOKEN || 'sophielog' }}
+        run: |
+          python3 -m pip install requests
+          python3 slo/generate-slo-report.py
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-report
+          path: slo-report.json
