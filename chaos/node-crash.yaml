@@ -1,1 +1,12 @@
-
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: node-pod-kill
+  namespace: matching
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    labelSelectors:
+      "app": "matching-engine"
+  duration: "1m"
