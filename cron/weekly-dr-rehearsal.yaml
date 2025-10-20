@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: weekly-dr-rehearsal
+  namespace: dr-tests
+spec:
+  schedule: "0 3 * * 1"  # 월요일 03:00
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: dr-weekly
+            image: bitnami/kubectl:1.30
+            command: ["sh","-c"]
+            args:
+            - |
+              echo "[DR] start rehearsal";
+              kubectl -n dr-tests create job --from=cronjob/weekly-dr-rehearsal r53-$(date +%s) --dry-run=client -o yaml \
+                | sed 's/weekly-dr-rehearsal/route53-failover-sim/g' \
+                | kubectl apply -f -;
+              sleep 10;
+              kubectl apply -f /manifests/rpo-rto-runner.yaml;
+          volumes:
+          - name: manifests
+            configMap:
+              name: dr-manifests
+              items:
+              - key: rpo-rto-runner.yaml
+                path: rpo-rto-runner.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dr-manifests
+  namespace: dr-tests
+data:
+  rpo-rto-runner.yaml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata: { name: rpo-rto-runner, namespace: dr-tests }
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: runner
+            image: public.ecr.aws/docker/library/alpine:3.20
+            command: ["/bin/sh","-c"]
+            args:
+            - apk add --no-cache curl bash jq;
+              wget -O /tmp/probe.sh https://raw.githubusercontent.com/2025-demo-01/tests-and-dr/main/scripts/rpo_rto_probe.sh;
+              chmod +x /tmp/probe.sh; /tmp/probe.sh;
+          envFrom:
+          - configMapRef: { name: rpo-rto-scripts }
