@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: chaos-kill-matching
+  namespace: dr-tests
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: kill
+        image: bitnami/kubectl:1.30
+        command: ["sh","-c"]
+        args:
+        - kubectl -n matching delete pod -l app=matching-engine --wait=false || true
