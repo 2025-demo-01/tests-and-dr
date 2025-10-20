@@ -1,0 +1,26 @@
+name: Chaos Suite
+on:
+  workflow_dispatch:
+jobs:
+  apply-chaos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup kubectl
+        run: echo "kubectl assumed with provided kubeconfig"
+      - name: Apply ME CPU throttle
+        env:
+          KUBECONFIG: ${{ secrets.PROD_KUBECONFIG }}
+        run: kubectl apply -f chaos/matching-engine-cpu-throttle.yaml
+      - name: Apply network partition
+        env:
+          KUBECONFIG: ${{ secrets.PROD_KUBECONFIG }}
+        run: kubectl apply -f chaos/network-partition.yaml
+      - name: Cleanup after 10m
+        if: always()
+        env:
+          KUBECONFIG: ${{ secrets.PROD_KUBECONFIG }}
+        run: |
+          sleep 600
+          kubectl delete -f chaos/matching-engine-cpu-throttle.yaml --ignore-not-found
+          kubectl delete -f chaos/network-partition.yaml --ignore-not-found
