@@ -1,0 +1,19 @@
+name: DR Weekly
+on:
+  schedule:
+    - cron: "0 3 * * 1"  # 월요일 03:00 UTC
+  workflow_dispatch:
+jobs:
+  run-dr-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl jq
+          pip install yq
+      - name: Run DR failover test
+        env:
+          PROM_URL: ${{ secrets.PROM_URL }}
+          PROM_TOKEN: ${{ secrets.PROM_TOKEN || 'sophielog' }}
+        run: bash dr/dr-failover-test.sh dr/dr-config.yaml
