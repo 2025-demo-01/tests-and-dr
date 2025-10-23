@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dlq-reprocess-trades
+  namespace: dr
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: reprocess
+              image: ghcr.io/2025-demo-01/tools:dlq-reprocess-0.1.0
+              args: ["--from=trades.dlq","--to=orders.in","--mode=filter-valid"]
+              env:
+                - name: KAFKA_BROKERS
+                  valueFrom: { secretKeyRef: { name: dr-secret, key: KAFKA_BROKERS } }
