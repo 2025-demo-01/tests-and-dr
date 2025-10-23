@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rpo-rto-probe
+  namespace: dr
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: probe
+          image: ghcr.io/2025-demo-01/tools:rpo-probe-0.1.0
+          args:
+            - "--produce-topic=orders.in"
+            - "--consume-topic=wallet.tx"
+            - "--timeout=120s"
+          env:
+            - name: KAFKA_BROKERS
+              valueFrom: { secretKeyRef: { name: dr-secret, key: KAFKA_BROKERS } }
